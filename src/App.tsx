@@ -34,11 +34,6 @@ export default function App() {
   const [colsInput, setColsInput] = useState(String(cols))
   const [rowsInput, setRowsInput] = useState(String(rows))
 
-  // Keep localGrid in sync when store.grid changes externally (URL restore, clear, resize)
-  useEffect(() => {
-    localGrid.current = [...store.grid]
-  }, [store.grid])
-
   // Sync input fields when store dims change
   useEffect(() => { setColsInput(String(cols)) }, [cols])
   useEffect(() => { setRowsInput(String(rows)) }, [rows])
@@ -82,7 +77,11 @@ export default function App() {
     }
   }, [cols, rows, cellSize, palette])
 
-  useEffect(() => { drawCanvas() }, [drawCanvas])
+  // Keep localGrid in sync when store.grid changes externally (URL restore, clear, resize)
+  useEffect(() => {
+    localGrid.current = [...store.grid]
+    drawCanvas()
+  }, [store.grid, drawCanvas])
 
   // ── Cell painting ──────────────────────────────────────────────────────────
 
