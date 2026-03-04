@@ -2,7 +2,7 @@ import '@/App.css'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { toast } from 'sonner'
-import { Trash2, Share2 } from 'lucide-react'
+import { RotateCcw, Share2 } from 'lucide-react'
 import { useStore } from './store'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -236,8 +236,8 @@ export default function App() {
           Neat Knit
         </h1>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" className="w-8 h-8" onClick={clearGrid} title="Clear canvas"><Trash2 size={15} /></Button>
-          <Button size="icon" className="w-8 h-8" onClick={copyUrl} title="Copy share link"><Share2 size={15} /></Button>
+          <Button variant="outline" size="icon" className="w-8 h-8" onClick={clearGrid} title="Clear canvas"><RotateCcw size={15} /></Button>
+          <Button variant="outline" size="icon" className="w-8 h-8" onClick={copyUrl} title="Copy share link"><Share2 size={15} /></Button>
         </div>
       </header>
 
@@ -328,7 +328,7 @@ export default function App() {
 
         <Separator orientation="vertical" className="h-6" style={{ background: 'var(--jq-border)' }} />
 
-        <Button variant="outline" size="icon" className="w-8 h-8" onClick={clearGrid} title="Clear canvas"><Trash2 size={15} /></Button>
+        <Button variant="outline" size="icon" className="w-8 h-8" onClick={clearGrid} title="Clear canvas"><RotateCcw size={15} /></Button>
         <Button size="icon" className="w-8 h-8" onClick={copyUrl} title="Copy share link"><Share2 size={15} /></Button>
       </header>
 
