@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { StateStorage } from 'zustand/middleware'
 
-export const CELL_SIZES = [8, 12, 16, 20, 24, 32]
 const DEFAULT_PALETTE = ['#1a1a1a', '#f5f0e8', '#c0392b', '#2471a3', '#1e8449', '#e67e22', '#8e44ad', '#f1c40f']
+const MIN_CELL = 2
+const MAX_CELL = 64
 
 // ── RLE helpers ──────────────────────────────────────────────────────────────
 
@@ -75,14 +76,14 @@ const hashStorage: StateStorage = {
 interface AppState {
   cols: number
   rows: number
-  cellSizeIdx: number
+  cellSize: number
   palette: string[]
   activeSwatch: number  // -1 = eraser
   grid: number[]        // flat, -1 = empty
   setActiveSwatch: (i: number) => void
   setPaletteColor: (i: number, color: string) => void
   zoom: (dir: 1 | -1) => void
-  setCellSizeIdx: (idx: number) => void
+  setCellSize: (size: number) => void
   resizeGrid: (c: number, r: number) => void
   setGrid: (grid: number[]) => void
   clearGrid: () => void
@@ -93,7 +94,7 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       cols: 30,
       rows: 30,
-      cellSizeIdx: 2,
+      cellSize: 16,
       palette: [...DEFAULT_PALETTE],
       activeSwatch: 0,
       grid: new Array(30 * 30).fill(-1),
@@ -107,10 +108,10 @@ export const useStore = create<AppState>()(
       },
 
       zoom: (dir) => set((s) => ({
-        cellSizeIdx: Math.max(0, Math.min(CELL_SIZES.length - 1, s.cellSizeIdx + dir)),
+        cellSize: Math.max(MIN_CELL, Math.min(MAX_CELL, s.cellSize + dir * 2)),
       })),
 
-      setCellSizeIdx: (idx) => set({ cellSizeIdx: Math.max(0, Math.min(CELL_SIZES.length - 1, idx)) }),
+      setCellSize: (size) => set({ cellSize: Math.max(MIN_CELL, Math.min(MAX_CELL, size)) }),
 
       resizeGrid: (c, r) => set((s) => {
         const newGrid = new Array(c * r).fill(-1)
@@ -132,7 +133,6 @@ export const useStore = create<AppState>()(
       partialize: (s) => ({
         cols: s.cols,
         rows: s.rows,
-        cellSizeIdx: s.cellSizeIdx,
         palette: s.palette,
         activeSwatch: s.activeSwatch,
         grid: s.grid,

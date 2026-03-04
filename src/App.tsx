@@ -1,34 +1,33 @@
+import '@/App.css'
+
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { Trash2, Share2 } from 'lucide-react'
-import './App.css'
-import { useStore, CELL_SIZES } from './store'
+import { useStore } from './store'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
 
 export default function App() {
   const store = useStore()
-  const { cols, rows, cellSizeIdx, palette, activeSwatch } = store
-  const cellSize = CELL_SIZES[cellSizeIdx]
+  const { cols, rows, cellSize, palette, activeSwatch } = store
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const localGrid = useRef<number[]>([...store.grid])
   const painting = useRef(false)
   const lastPainted = useRef(-1)
   const pinchRef = useRef<number | null>(null)
 
-  // Auto-fit on first load (no saved zoom in hash)
+  // Fit grid to container on load
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.slice(1))
-    if (params.has('s')) return  // respect saved state
-    const HEADER_H = 100
-    const PAD = 32
-    const availW = window.innerWidth - PAD
-    const availH = window.innerHeight - HEADER_H - PAD
-    const target = Math.min(availW / cols, availH / rows)
-    const idx = CELL_SIZES.findLastIndex(s => s <= target)
-    if (idx >= 0) store.setCellSizeIdx(idx)
+    requestAnimationFrame(() => {
+      const rect = containerRef.current?.getBoundingClientRect()
+      if (!rect || !rect.width || !rect.height) return
+      const PAD = 32  // container p-4 = 16px each side
+      const size = Math.floor(Math.min((rect.width - PAD) / cols, (rect.height - PAD) / rows))
+      if (size > 0) store.setCellSize(size)
+    })
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const [colsInput, setColsInput] = useState(String(cols))
@@ -197,7 +196,7 @@ export default function App() {
       if (!isNaN(n) && n >= 1 && n <= palette.length) { store.setActiveSwatch(n - 1); return }
       if (e.key === 'e' || e.key === '0') { store.setActiveSwatch(-1); return }
       if (e.key === '+' || e.key === '=') { store.zoom(1); return }
-      if (e.key === '-') { store.zoom(-1); return }
+      if (e.key === '-' || e.key === '_') { store.zoom(-1); return }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -334,7 +333,8 @@ export default function App() {
       </header>
 
       <div
-        className="flex-1 overflow-auto p-2 sm:p-4 flex items-center justify-center"
+        ref={containerRef}
+        className="flex-1 overflow-auto p-4 flex items-center justify-center"
         style={{ touchAction: 'none' }}
         onWheel={(e) => {
           e.preventDefault()
