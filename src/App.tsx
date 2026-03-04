@@ -219,7 +219,7 @@ export default function App() {
         style={{ background: 'var(--jq-surface)', borderColor: 'var(--jq-border)' }}
       >
         <h1 className="flex items-center gap-2 text-xl shrink-0 leading-none" style={{ fontFamily: "'Playfair Display', serif", letterSpacing: '0.02em' }}>
-          <img src="/icon.svg" alt="" width={24} height={24} className="block" />
+          <img src="icon.svg" alt="" width={24} height={24} className="block" />
           Neat Knit
         </h1>
         <div className="flex gap-2">
@@ -234,7 +234,7 @@ export default function App() {
         style={{ background: 'var(--jq-surface)', borderColor: 'var(--jq-border)' }}
       >
         <h1 className="flex items-center gap-2 shrink-0 text-xl leading-none" style={{ fontFamily: "'Playfair Display', serif", letterSpacing: '0.02em' }}>
-          <img src="/icon.svg" alt="" width={24} height={24} className="block" />
+          <img src="icon.svg" alt="" width={24} height={24} className="block" />
           Neat Knit
         </h1>
 
