@@ -2,13 +2,13 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { Trash2, Share2 } from 'lucide-react'
 import './App.css'
-import { useJacquardStore, CELL_SIZES } from './store'
+import { useStore, CELL_SIZES } from './store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 
 export default function App() {
-  const store = useJacquardStore()
+  const store = useStore()
   const { cols, rows, cellSizeIdx, palette, activeSwatch } = store
   const cellSize = CELL_SIZES[cellSizeIdx]
 
@@ -16,6 +16,20 @@ export default function App() {
   const localGrid = useRef<number[]>([...store.grid])
   const painting = useRef(false)
   const lastPainted = useRef(-1)
+  const pinchRef = useRef<number | null>(null)
+
+  // Auto-fit on first load (no saved zoom in hash)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    if (params.has('s')) return  // respect saved state
+    const HEADER_H = 100
+    const PAD = 32
+    const availW = window.innerWidth - PAD
+    const availH = window.innerHeight - HEADER_H - PAD
+    const target = Math.min(availW / cols, availH / rows)
+    const idx = CELL_SIZES.findLastIndex(s => s <= target)
+    if (idx >= 0) store.setCellSizeIdx(idx)
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const [colsInput, setColsInput] = useState(String(cols))
   const [rowsInput, setRowsInput] = useState(String(rows))
@@ -319,7 +333,35 @@ export default function App() {
         <Button size="icon" className="w-8 h-8" onClick={copyUrl} title="Copy share link"><Share2 size={15} /></Button>
       </header>
 
-      <div className="flex-1 overflow-auto p-2 sm:p-4 flex items-center justify-center">
+      <div
+        className="flex-1 overflow-auto p-2 sm:p-4 flex items-center justify-center"
+        style={{ touchAction: 'none' }}
+        onWheel={(e) => {
+          e.preventDefault()
+          store.zoom(e.deltaY < 0 ? 1 : -1)
+        }}
+        onTouchStart={(e) => {
+          if (e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX
+            const dy = e.touches[0].clientY - e.touches[1].clientY
+            pinchRef.current = Math.hypot(dx, dy)
+          }
+        }}
+        onTouchMove={(e) => {
+          if (e.touches.length === 2 && pinchRef.current !== null) {
+            e.preventDefault()
+            const dx = e.touches[0].clientX - e.touches[1].clientX
+            const dy = e.touches[0].clientY - e.touches[1].clientY
+            const dist = Math.hypot(dx, dy)
+            const delta = dist - pinchRef.current
+            if (Math.abs(delta) > 30) {
+              store.zoom(delta > 0 ? 1 : -1)
+              pinchRef.current = dist
+            }
+          }
+        }}
+        onTouchEnd={() => { pinchRef.current = null }}
+      >
         <canvas
           ref={canvasRef}
           className="border shadow cursor-crosshair touch-none select-none"

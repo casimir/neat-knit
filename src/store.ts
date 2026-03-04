@@ -72,7 +72,7 @@ const hashStorage: StateStorage = {
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
-interface JacquardState {
+interface AppState {
   cols: number
   rows: number
   cellSizeIdx: number
@@ -82,12 +82,13 @@ interface JacquardState {
   setActiveSwatch: (i: number) => void
   setPaletteColor: (i: number, color: string) => void
   zoom: (dir: 1 | -1) => void
+  setCellSizeIdx: (idx: number) => void
   resizeGrid: (c: number, r: number) => void
   setGrid: (grid: number[]) => void
   clearGrid: () => void
 }
 
-export const useJacquardStore = create<JacquardState>()(
+export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
       cols: 30,
@@ -109,6 +110,8 @@ export const useJacquardStore = create<JacquardState>()(
         cellSizeIdx: Math.max(0, Math.min(CELL_SIZES.length - 1, s.cellSizeIdx + dir)),
       })),
 
+      setCellSizeIdx: (idx) => set({ cellSizeIdx: Math.max(0, Math.min(CELL_SIZES.length - 1, idx)) }),
+
       resizeGrid: (c, r) => set((s) => {
         const newGrid = new Array(c * r).fill(-1)
         for (let row = 0; row < Math.min(r, s.rows); row++) {
@@ -124,7 +127,7 @@ export const useJacquardStore = create<JacquardState>()(
       clearGrid: () => set((s) => ({ grid: new Array(s.cols * s.rows).fill(-1) })),
     }),
     {
-      name: 'neat-knit',
+      name: 's',
       storage: createJSONStorage(() => hashStorage),
       partialize: (s) => ({
         cols: s.cols,
