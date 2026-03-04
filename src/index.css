@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap');
+
+:root {
+  --jq-bg: #f5f0e8;
+  --jq-surface: #ede8df;
+  --jq-border: #c8bfaf;
+  --jq-text: #2a2118;
+  --jq-muted: #8a7f70;
+  --jq-accent: #c0392b;
+  font-family: 'DM Mono', monospace;
+}
+
+body { margin: 0; }

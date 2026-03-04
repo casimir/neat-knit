@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="#f5f0e8"/>
+  <rect width="64" height="64" rx="14" fill="none" stroke="#c8bfaf" stroke-width="2"/>
+
+  <!-- 5×5 nordic diamond motif, cell=9px gap=1px, offset=7.5 -->
+  <!-- Dark (#2a2118): tips + diagonals -->
+  <rect x="27.5" y="7.5"  width="9" height="9" rx="1.5" fill="#2a2118"/>
+
+  <rect x="17.5" y="17.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+  <rect x="37.5" y="17.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+
+  <rect x="7.5"  y="27.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+  <rect x="27.5" y="27.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+  <rect x="47.5" y="27.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+
+  <rect x="17.5" y="37.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+  <rect x="37.5" y="37.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+
+  <rect x="27.5" y="47.5" width="9" height="9" rx="1.5" fill="#2a2118"/>
+
+  <!-- Red (#c0392b): cardinal ring -->
+  <rect x="27.5" y="17.5" width="9" height="9" rx="1.5" fill="#c0392b"/>
+
+  <rect x="17.5" y="27.5" width="9" height="9" rx="1.5" fill="#c0392b"/>
+  <rect x="37.5" y="27.5" width="9" height="9" rx="1.5" fill="#c0392b"/>
+
+  <rect x="27.5" y="37.5" width="9" height="9" rx="1.5" fill="#c0392b"/>
+</svg>
