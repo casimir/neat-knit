@@ -7,6 +7,7 @@ import { useStore } from './store'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
+import { SwatchPicker } from '@/components/SwatchPicker'
 
 export default function App() {
   const store = useStore()
@@ -89,16 +90,15 @@ export default function App() {
     if (idx < 0 || idx >= localGrid.current.length) return
     if (idx === lastPainted.current) return
     lastPainted.current = idx
-    const newVal = activeSwatch === -1 ? -1 : activeSwatch
-    if (localGrid.current[idx] === newVal) return
-    localGrid.current[idx] = newVal
+    if (localGrid.current[idx] === activeSwatch) return
+    localGrid.current[idx] = activeSwatch
 
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')!
     const r = Math.floor(idx / cols)
     const c = idx % cols
-    ctx.fillStyle = newVal >= 0 ? palette[newVal] : '#f5f0e8'
+    ctx.fillStyle = activeSwatch >= 0 ? palette[activeSwatch] : '#f5f0e8'
     ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize)
 
     // Redraw grid lines over this cell
@@ -195,8 +195,6 @@ export default function App() {
       const n = parseInt(e.key)
       if (!isNaN(n) && n >= 1 && n <= palette.length) { store.setActiveSwatch(n - 1); return }
       if (e.key === 'e' || e.key === '0') { store.setActiveSwatch(-1); return }
-      if (e.key === '+' || e.key === '=') { store.zoom(1); return }
-      if (e.key === '-' || e.key === '_') { store.zoom(-1); return }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -251,56 +249,7 @@ export default function App() {
           Neat Knit
         </h1>
 
-        {/* Palette */}
-        <div className="flex gap-1 items-center">
-          {palette.map((color, i) => (
-            <div
-              key={i}
-              title={color}
-              onClick={() => store.setActiveSwatch(i)}
-              className="relative cursor-pointer transition-transform hover:scale-110 shrink-0"
-              style={{
-                width: 28, height: 28,
-                borderRadius: 3,
-                background: color,
-                border: `2px solid ${activeSwatch === i ? 'var(--jq-text)' : 'transparent'}`,
-                transform: activeSwatch === i ? 'scale(1.15)' : undefined,
-              }}
-            >
-              <input
-                type="color"
-                value={color}
-                onChange={(e) => store.setPaletteColor(i, e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                style={{ position: 'absolute', opacity: 0, inset: 0, width: '100%', height: '100%', cursor: 'pointer' }}
-              />
-            </div>
-          ))}
-          {/* Eraser */}
-          <div
-            title="Eraser"
-            onClick={() => store.setActiveSwatch(-1)}
-            className="flex items-center justify-center cursor-pointer shrink-0 text-sm"
-            style={{
-              width: 28, height: 28,
-              borderRadius: 3,
-              background: 'var(--jq-bg)',
-              border: `2px ${activeSwatch === -1 ? 'solid var(--jq-text)' : 'dashed var(--jq-border)'}`,
-              transform: activeSwatch === -1 ? 'scale(1.15)' : undefined,
-            }}
-          >
-            ✕
-          </div>
-        </div>
-
-        <Separator orientation="vertical" className="h-6" style={{ background: 'var(--jq-border)' }} />
-
-        {/* Zoom */}
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" className="w-7 h-7" onClick={() => store.zoom(-1)}>−</Button>
-          <span className="text-xs w-8 text-center" style={{ color: 'var(--jq-muted)' }}>{cellSize}</span>
-          <Button variant="outline" size="icon" className="w-7 h-7" onClick={() => store.zoom(1)}>+</Button>
-        </div>
+        <SwatchPicker size={28} />
 
         <Separator orientation="vertical" className="h-6" style={{ background: 'var(--jq-border)' }} />
 
@@ -374,49 +323,7 @@ export default function App() {
         className="flex sm:hidden items-center gap-2 px-3 py-2 border-t overflow-x-auto shrink-0"
         style={{ background: 'var(--jq-surface)', borderColor: 'var(--jq-border)' }}
       >
-        {palette.map((color, i) => (
-          <div
-            key={i}
-            title={color}
-            onClick={() => store.setActiveSwatch(i)}
-            className="relative cursor-pointer shrink-0"
-            style={{
-              width: 36, height: 36,
-              borderRadius: 4,
-              background: color,
-              border: `2px solid ${activeSwatch === i ? 'var(--jq-text)' : 'transparent'}`,
-              transform: activeSwatch === i ? 'scale(1.1)' : undefined,
-            }}
-          >
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => store.setPaletteColor(i, e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              style={{ position: 'absolute', opacity: 0, inset: 0, width: '100%', height: '100%', cursor: 'pointer' }}
-            />
-          </div>
-        ))}
-        <div
-          title="Eraser"
-          onClick={() => store.setActiveSwatch(-1)}
-          className="flex items-center justify-center cursor-pointer shrink-0 text-sm"
-          style={{
-            width: 36, height: 36,
-            borderRadius: 4,
-            background: 'var(--jq-bg)',
-            border: `2px ${activeSwatch === -1 ? 'solid var(--jq-text)' : 'dashed var(--jq-border)'}`,
-            transform: activeSwatch === -1 ? 'scale(1.1)' : undefined,
-          }}
-        >
-          ✕
-        </div>
-
-        <Separator orientation="vertical" className="h-6 shrink-0" style={{ background: 'var(--jq-border)' }} />
-
-        <Button variant="outline" size="icon" className="w-9 h-9 shrink-0" onClick={() => store.zoom(-1)}>−</Button>
-        <span className="text-xs w-8 text-center shrink-0" style={{ color: 'var(--jq-muted)' }}>{cellSize}</span>
-        <Button variant="outline" size="icon" className="w-9 h-9 shrink-0" onClick={() => store.zoom(1)}>+</Button>
+        <SwatchPicker size={36} />
 
         <Separator orientation="vertical" className="h-6 shrink-0" style={{ background: 'var(--jq-border)' }} />
 
