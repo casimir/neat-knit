@@ -35,19 +35,20 @@ function decodeRLE(str: string, len: number): number[] {
 // ── Hash storage ─────────────────────────────────────────────────────────────
 
 const hashStorage: StateStorage = {
-  getItem: (key): string => {
+  getItem: (key): string | null => {
     const searchParams = new URLSearchParams(location.hash.slice(1))
-    const storedValue = searchParams.get(key) ?? ''
-    if (!storedValue) return storedValue
+    const storedValue = searchParams.get(key)
+    if (!storedValue) return null
     try {
-      const parsed = JSON.parse(storedValue)
+      const json = atob(storedValue)
+      const parsed = JSON.parse(json)
       if (parsed?.state?.gridRle != null) {
         parsed.state.grid = decodeRLE(parsed.state.gridRle, parsed.state.cols * parsed.state.rows)
         delete parsed.state.gridRle
       }
       return JSON.stringify(parsed)
     } catch {
-      return storedValue
+      return null
     }
   },
   setItem: (key, newValue): void => {
@@ -58,9 +59,9 @@ const hashStorage: StateStorage = {
         parsed.state.gridRle = encodeRLE(parsed.state.grid)
         delete parsed.state.grid
       }
-      searchParams.set(key, JSON.stringify(parsed))
+      searchParams.set(key, btoa(JSON.stringify(parsed)))
     } catch {
-      searchParams.set(key, newValue)
+      searchParams.set(key, btoa(newValue))
     }
     location.hash = searchParams.toString()
   },
